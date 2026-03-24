@@ -11,17 +11,12 @@
 <div class="app-shell">
   <aside class="sidebar">
     <section class="brand-card">
-      <p class="eyebrow">POEX Certificate Studio</p>
       <h1>POEX 证书生成器</h1>
-      <p class="brand-copy">黑金模板实时预览，直接拖拽头像、姓名和 UID，快速确认默认坐标。</p>
     </section>
 
     <section class="sidebar-card">
       <div class="section-title-row">
-        <div>
-          <p class="section-kicker">Template Group</p>
-          <h2>模板列表</h2>
-        </div>
+        <h2>模板列表</h2>
         <span id="templateCount" class="template-total">10 张</span>
       </div>
       <div id="templateGroups" class="template-groups"></div>
@@ -29,14 +24,10 @@
 
     <section class="sidebar-card">
       <div class="section-title-row compact-row">
-        <div>
-          <p class="section-kicker">Canvas Size</p>
-          <h2>当前模板</h2>
-        </div>
+        <h2>当前模板</h2>
       </div>
       <p id="currentTemplateLabel" class="current-template-label">POEX 晋级图 中文 01</p>
       <p id="currentTemplateMeta" class="current-template-meta">1536 x 2752</p>
-      <p class="card-hint">导出保持原始尺寸，预览区域按页面宽度自适应缩放。</p>
     </section>
   </aside>
 
@@ -44,15 +35,7 @@
     <section class="preview-panel">
       <div class="panel-card preview-card">
         <div class="section-title-row preview-row">
-          <div>
-            <p class="section-kicker">Preview</p>
-            <h2>证书预览</h2>
-            <p class="card-hint">在画布上直接点选图层进行拖拽，右侧面板会同步显示坐标与尺寸。</p>
-          </div>
-          <div class="preview-actions">
-            <button type="button" class="action-btn" id="copyBtn">复制图片</button>
-            <button type="button" class="action-btn action-btn-strong" id="downloadBtn">下载 PNG</button>
-          </div>
+          <h2>证书预览</h2>
         </div>
         <div class="canvas-shell">
           <div class="canvas-stage">
@@ -77,155 +60,65 @@
     </section>
 
     <aside class="controls-panel">
-      <div class="panel-card output-card">
-        <div class="section-title-row compact-row">
-          <div>
-            <p class="section-kicker">Active Layer</p>
-            <h2>当前激活层</h2>
-          </div>
-        </div>
-        <div class="inspector-grid">
-          <div class="stat-chip">
-            <span>对象</span>
-            <strong id="activeLayerLabel">头像</strong>
-          </div>
-          <div class="stat-chip">
-            <span>坐标</span>
-            <strong id="activeLayerCoords">X 554 / Y 470</strong>
-          </div>
-          <div class="stat-chip">
-            <span>尺寸</span>
-            <strong id="activeLayerScale">428 px</strong>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel-card control-card coords-card">
+      <div class="panel-card control-card layer-card" data-layer="avatar">
         <div class="control-header">
-          <div>
-            <h3>微调台</h3>
-            <p>方向键移动当前激活层，放大缩小用于头像尺寸或文字字号。</p>
-          </div>
+          <h3>头像</h3>
         </div>
-        <div class="nudge-grid">
-          <label class="field">
-            <span>微调步长</span>
-            <input type="number" id="nudgeStepInput" min="1" step="1" value="4">
-          </label>
-          <div class="step-group grow-group">
-            <button type="button" class="micro-btn" data-scale="-1">缩小</button>
-            <button type="button" class="micro-btn" data-scale="1">放大</button>
-          </div>
-        </div>
-        <div class="arrow-pad" aria-label="移动当前图层">
-          <button type="button" class="arrow-btn arrow-up" data-move-x="0" data-move-y="-1" aria-label="上移"></button>
-          <button type="button" class="arrow-btn arrow-left" data-move-x="-1" data-move-y="0" aria-label="左移"></button>
-          <button type="button" class="arrow-btn arrow-right" data-move-x="1" data-move-y="0" aria-label="右移"></button>
-          <button type="button" class="arrow-btn arrow-down" data-move-x="0" data-move-y="1" aria-label="下移"></button>
-        </div>
-      </div>
-
-      <div class="panel-card control-card layer-card is-active" data-layer="avatar">
-        <div class="control-header">
-          <div>
-            <h3>头像</h3>
-            <p>支持上传，或直接使用 Ctrl/Cmd + V 粘贴头像。</p>
-          </div>
-          <span class="card-badge" data-layer-badge="avatar">当前</span>
-        </div>
+        <p class="control-note">1.支持复制图片粘贴到网站,上传头像</p>
         <div class="field-grid">
           <label class="field field-wide">
             <span>头像图片</span>
             <input type="file" id="avatarUpload" accept="image/*">
           </label>
-          <label class="field">
-            <span>X</span>
-            <input type="number" id="avatarXInput" step="1">
-          </label>
-          <label class="field">
-            <span>Y</span>
-            <input type="number" id="avatarYInput" step="1">
-          </label>
-          <label class="field">
-            <span>尺寸</span>
-            <input type="number" id="avatarSizeInput" step="1" min="1">
-          </label>
-        </div>
-        <div class="control-footer compact-footer">
-          <div class="step-group grow-group">
-            <button type="button" class="micro-btn" data-scale="-1" data-layer="avatar">缩小</button>
-            <button type="button" class="micro-btn" data-scale="1" data-layer="avatar">放大</button>
-            <button type="button" class="micro-btn" data-activate-layer="avatar">选中头像</button>
-          </div>
         </div>
       </div>
 
       <div class="panel-card control-card layer-card" data-layer="name">
         <div class="control-header">
-          <div>
-            <h3>姓名</h3>
-            <p>字体为马善政毛笔楷书，颜色为 #121212，带左上内嵌白色高光。</p>
-          </div>
-          <span class="card-badge" data-layer-badge="name">待选</span>
+          <h3>姓名</h3>
         </div>
+        <p class="control-note">2.直接填写姓名,如果太大,缩小文字</p>
         <div class="field-grid">
           <label class="field field-wide">
             <span>姓名文本</span>
             <input type="text" id="nameInput" placeholder="输入姓名">
           </label>
-          <label class="field">
-            <span>X</span>
-            <input type="number" id="nameXInput" step="1">
-          </label>
-          <label class="field">
-            <span>Y</span>
-            <input type="number" id="nameYInput" step="1">
-          </label>
-          <label class="field">
-            <span>字号</span>
-            <input type="number" id="nameFontSizeInput" step="1" min="1">
-          </label>
         </div>
         <div class="control-footer compact-footer">
           <div class="step-group grow-group">
-            <button type="button" class="micro-btn" data-scale="-1" data-layer="name">缩小</button>
-            <button type="button" class="micro-btn" data-scale="1" data-layer="name">放大</button>
-            <button type="button" class="micro-btn" data-activate-layer="name">选中姓名</button>
+            <button type="button" class="micro-btn" data-scale="-1" data-layer="name">缩小文字</button>
+            <button type="button" class="micro-btn" data-scale="1" data-layer="name">放大文字</button>
           </div>
         </div>
       </div>
 
       <div class="panel-card control-card layer-card" data-layer="uid">
         <div class="control-header">
-          <div>
-            <h3>UID</h3>
-            <p>字体为 Arial Unicode MS，颜色与姓名一致，使用同款内嵌高光。</p>
-          </div>
-          <span class="card-badge" data-layer-badge="uid">待选</span>
+          <h3>UID</h3>
         </div>
+        <p class="control-note">3.填写完成,右键复制图片发送</p>
         <div class="field-grid">
           <label class="field field-wide">
             <span>UID 文本</span>
             <input type="text" id="uidInput" placeholder="输入 UID">
           </label>
-          <label class="field">
-            <span>X</span>
-            <input type="number" id="uidXInput" step="1">
-          </label>
-          <label class="field">
-            <span>Y</span>
-            <input type="number" id="uidYInput" step="1">
-          </label>
-          <label class="field">
-            <span>字号</span>
-            <input type="number" id="uidFontSizeInput" step="1" min="1">
-          </label>
         </div>
         <div class="control-footer compact-footer">
           <div class="step-group grow-group">
-            <button type="button" class="micro-btn" data-scale="-1" data-layer="uid">缩小</button>
-            <button type="button" class="micro-btn" data-scale="1" data-layer="uid">放大</button>
-            <button type="button" class="micro-btn" data-activate-layer="uid">选中 UID</button>
+            <button type="button" class="micro-btn" data-scale="-1" data-layer="uid">缩小文字</button>
+            <button type="button" class="micro-btn" data-scale="1" data-layer="uid">放大文字</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel-card control-card export-card">
+        <div class="control-header">
+          <h3>导出</h3>
+        </div>
+        <div class="control-footer compact-footer export-actions">
+          <div class="step-group grow-group">
+            <button type="button" class="action-btn" id="copyBtn">复制图片</button>
+            <button type="button" class="action-btn action-btn-strong" id="downloadBtn">下载 PNG</button>
           </div>
         </div>
       </div>

@@ -20,22 +20,16 @@ class PoexCertificateEditor {
       pointerId: null
     };
 
-    this.layerLabels = {
-      avatar: "头像",
-      name: "姓名",
-      uid: "UID"
-    };
-
     this.textStyles = {
       name: {
         fontFamily: '"PoexNameFont"',
-        fill: "#121212",
-        placeholder: "姓名"
+        fill: "#000000",
+        shadow: false
       },
       uid: {
         fontFamily: '"PoexUidFont"',
-        fill: "#121212",
-        placeholder: "UID"
+        fill: "#000000",
+        shadow: false
       }
     };
 
@@ -45,9 +39,9 @@ class PoexCertificateEditor {
       activeLayer: "avatar",
       nudgeStep: 4,
       avatar: {
-        x: 554,
-        y: 470,
-        size: 428,
+        x: 563,
+        y: 601,
+        size: 416,
         minSize: 100,
         maxSize: 900,
         image: null,
@@ -55,9 +49,9 @@ class PoexCertificateEditor {
       },
       name: {
         value: "",
-        x: 768,
-        y: 1004,
-        fontSize: 104,
+        x: 773,
+        y: 1202,
+        fontSize: 92,
         minFontSize: 28,
         maxFontSize: 260,
         anchor: "baseline-center",
@@ -65,9 +59,9 @@ class PoexCertificateEditor {
       },
       uid: {
         value: "",
-        x: 768,
-        y: 1140,
-        fontSize: 62,
+        x: 834,
+        y: 1326,
+        fontSize: 54,
         minFontSize: 20,
         maxFontSize: 180,
         anchor: "baseline-center",
@@ -89,28 +83,11 @@ class PoexCertificateEditor {
       avatarUpload: document.getElementById("avatarUpload"),
       nameInput: document.getElementById("nameInput"),
       uidInput: document.getElementById("uidInput"),
-      nudgeStepInput: document.getElementById("nudgeStepInput"),
-      activeLayerLabel: document.getElementById("activeLayerLabel"),
-      activeLayerCoords: document.getElementById("activeLayerCoords"),
-      activeLayerScale: document.getElementById("activeLayerScale"),
       layerCards: Array.from(document.querySelectorAll(".layer-card")),
-      layerBadges: Array.from(document.querySelectorAll("[data-layer-badge]")),
       numericInputs: {
-        avatar: {
-          x: document.getElementById("avatarXInput"),
-          y: document.getElementById("avatarYInput"),
-          size: document.getElementById("avatarSizeInput")
-        },
-        name: {
-          x: document.getElementById("nameXInput"),
-          y: document.getElementById("nameYInput"),
-          fontSize: document.getElementById("nameFontSizeInput")
-        },
-        uid: {
-          x: document.getElementById("uidXInput"),
-          y: document.getElementById("uidYInput"),
-          fontSize: document.getElementById("uidFontSizeInput")
-        }
+        avatar: {},
+        name: {},
+        uid: {}
       }
     };
   }
@@ -155,7 +132,6 @@ class PoexCertificateEditor {
   async init() {
     this.bindEvents();
     this.syncAllInputs();
-    this.updateInspector();
     await this.loadFonts();
     await this.loadManifest();
     this.renderTemplateGroups();
@@ -258,16 +234,6 @@ class PoexCertificateEditor {
       this.setActiveLayer("uid");
       this.draw();
     });
-
-    this.dom.nudgeStepInput.addEventListener("input", () => {
-      const nextValue = Number(this.dom.nudgeStepInput.value);
-      if (!Number.isFinite(nextValue)) {
-        return;
-      }
-      this.editorState.nudgeStep = Math.max(1, Math.round(nextValue));
-      this.dom.nudgeStepInput.value = this.editorState.nudgeStep;
-    });
-
     this.bindNumericInputs();
     this.bindLayerControls();
     this.bindCanvasEvents();
@@ -295,27 +261,12 @@ class PoexCertificateEditor {
       });
     });
 
-    document.querySelectorAll("[data-activate-layer]").forEach((button) => {
-      button.addEventListener("click", () => {
-        this.setActiveLayer(button.dataset.activateLayer);
-      });
-    });
-
     document.querySelectorAll("[data-scale]").forEach((button) => {
       button.addEventListener("click", () => {
-        const layerKey = button.dataset.layer || this.editorState.activeLayer;
+        const layerKey = button.dataset.layer;
         const direction = Number(button.dataset.scale);
         this.setActiveLayer(layerKey);
         this.resizeLayer(layerKey, direction);
-      });
-    });
-
-    document.querySelectorAll("[data-move-x]").forEach((button) => {
-      button.addEventListener("click", () => {
-        const step = this.editorState.nudgeStep;
-        const dx = Number(button.dataset.moveX) * step;
-        const dy = Number(button.dataset.moveY) * step;
-        this.nudgeLayer(this.editorState.activeLayer, dx, dy);
       });
     });
   }
@@ -370,7 +321,6 @@ class PoexCertificateEditor {
     layer.y = Math.round(point.y - this.pointerState.offsetY);
     this.clampLayer(layerKey);
     this.syncLayerInputs(layerKey);
-    this.updateInspector();
     this.draw();
   }
 
@@ -421,6 +371,10 @@ class PoexCertificateEditor {
       return distance <= radius + 18;
     }
 
+    if (!this.getDisplayValue(layerKey)) {
+      return false;
+    }
+
     const bounds = this.getTextBounds(layerKey);
     return x >= bounds.left && x <= bounds.right && y >= bounds.top && y <= bounds.bottom;
   }
@@ -451,6 +405,14 @@ class PoexCertificateEditor {
     const layer = this.editorState[layerKey];
     const style = this.textStyles[layer.styleKey];
     const displayValue = this.getDisplayValue(layerKey);
+
+    if (!displayValue) {
+      return {
+        width: 0,
+        ascent: 0,
+        descent: 0
+      };
+    }
 
     this.ctx.save();
     this.ctx.font = `${layer.fontSize}px ${style.fontFamily}, serif`;
@@ -570,22 +532,11 @@ class PoexCertificateEditor {
     }
 
     this.editorState.activeLayer = layerKey;
-    this.dom.layerCards.forEach((card) => {
-      card.classList.toggle("is-active", card.dataset.layer === layerKey);
-    });
-
-    this.dom.layerBadges.forEach((badge) => {
-      badge.textContent = badge.dataset.layerBadge === layerKey ? "当前" : "待选";
-    });
-
-    this.updateInspector();
-    this.draw();
   }
 
   syncAllInputs() {
     this.dom.nameInput.value = this.editorState.name.value;
     this.dom.uidInput.value = this.editorState.uid.value;
-    this.dom.nudgeStepInput.value = this.editorState.nudgeStep;
     this.syncLayerInputs("avatar");
     this.syncLayerInputs("name");
     this.syncLayerInputs("uid");
@@ -596,19 +547,6 @@ class PoexCertificateEditor {
     Object.entries(this.dom.numericInputs[layerKey]).forEach(([key, input]) => {
       input.value = Math.round(layer[key]);
     });
-    this.updateInspector();
-  }
-
-  updateInspector() {
-    const layerKey = this.editorState.activeLayer;
-    const layer = this.editorState[layerKey];
-    const scaleLabel = layerKey === "avatar"
-      ? `${Math.round(layer.size)} px`
-      : `${Math.round(layer.fontSize)} px`;
-
-    this.dom.activeLayerLabel.textContent = this.layerLabels[layerKey];
-    this.dom.activeLayerCoords.textContent = `X ${Math.round(layer.x)} / Y ${Math.round(layer.y)}`;
-    this.dom.activeLayerScale.textContent = scaleLabel;
   }
 
   updateLayerNumeric(layerKey, key, rawValue) {
@@ -714,7 +652,6 @@ class PoexCertificateEditor {
     this.drawAvatarLayer();
     this.drawTextLayer("name");
     this.drawTextLayer("uid");
-    this.drawActiveLayerOverlay();
   }
 
   drawAvatarLayer() {
@@ -765,98 +702,24 @@ class PoexCertificateEditor {
     const layer = this.editorState[layerKey];
     const style = this.textStyles[layer.styleKey];
     const displayValue = this.getDisplayValue(layerKey);
-    const metrics = this.measureTextLayer(layerKey);
-    const padding = Math.ceil(layer.fontSize * 0.42);
-    const offscreen = document.createElement("canvas");
-    offscreen.width = Math.max(1, Math.ceil(metrics.width + padding * 2));
-    offscreen.height = Math.max(1, Math.ceil(metrics.ascent + metrics.descent + padding * 2));
-    const offctx = offscreen.getContext("2d");
-    const baselineX = layer.anchor === "baseline-center"
-      ? offscreen.width / 2
-      : padding;
-    const baselineY = padding + metrics.ascent;
-    const isPlaceholder = layer.value.trim().length === 0;
-    const highlightOffset = Math.max(1, layer.fontSize * 0.018);
-    const highlightAlpha = isPlaceholder ? 0.28 : 0.76;
-    const fillAlpha = isPlaceholder ? 0.42 : 0.98;
-    const lineWidth = Math.max(1, layer.fontSize * 0.015);
-
-    offctx.font = `${layer.fontSize}px ${style.fontFamily}, serif`;
-    offctx.textAlign = layer.anchor === "baseline-center" ? "center" : "left";
-    offctx.textBaseline = "alphabetic";
-    offctx.fillStyle = style.fill;
-    offctx.globalAlpha = fillAlpha;
-    offctx.fillText(displayValue, baselineX, baselineY);
-
-    offctx.globalCompositeOperation = "source-atop";
-    offctx.strokeStyle = `rgba(255, 255, 255, ${highlightAlpha})`;
-    offctx.lineWidth = lineWidth;
-    offctx.strokeText(displayValue, baselineX - highlightOffset, baselineY - highlightOffset);
-    offctx.fillStyle = `rgba(255, 255, 255, ${highlightAlpha * 0.16})`;
-    offctx.fillText(displayValue, baselineX - highlightOffset * 0.4, baselineY - highlightOffset * 0.4);
-    offctx.globalCompositeOperation = "source-over";
-
-    const drawX = Math.round(layer.anchor === "baseline-center" ? layer.x - offscreen.width / 2 : layer.x - padding);
-    const drawY = Math.round(layer.y - metrics.ascent - padding);
-    this.ctx.drawImage(offscreen, drawX, drawY);
-  }
-
-  drawActiveLayerOverlay() {
-    const layerKey = this.editorState.activeLayer;
-    this.ctx.save();
-    this.ctx.strokeStyle = "rgba(255, 214, 123, 0.88)";
-    this.ctx.fillStyle = "rgba(255, 214, 123, 0.14)";
-    this.ctx.lineWidth = 3;
-    this.ctx.setLineDash([12, 10]);
-
-    if (layerKey === "avatar") {
-      const avatar = this.editorState.avatar;
-      const radius = avatar.size / 2;
-      this.ctx.beginPath();
-      this.ctx.arc(avatar.x + radius, avatar.y + radius, radius + 8, 0, Math.PI * 2);
-      this.ctx.closePath();
-      this.ctx.stroke();
-    } else {
-      const bounds = this.getTextBounds(layerKey);
-      this.roundRect(bounds.left, bounds.top, bounds.width, bounds.height, 20);
-      this.ctx.fill();
-      this.ctx.stroke();
+    if (!displayValue) {
+      return;
     }
 
-    this.ctx.setLineDash([]);
-    this.drawOverlayTag(layerKey);
-    this.ctx.restore();
-  }
+    this.ctx.save();
+    this.ctx.font = `${layer.fontSize}px ${style.fontFamily}, serif`;
+    this.ctx.textAlign = layer.anchor === "baseline-center" ? "center" : "left";
+    this.ctx.textBaseline = "alphabetic";
 
-  drawOverlayTag(layerKey) {
-    const label = this.layerLabels[layerKey];
-    let tagX = 32;
-    let tagY = 32;
-
-    if (layerKey === "avatar") {
-      tagX = this.editorState.avatar.x;
-      tagY = this.editorState.avatar.y - 54;
-    } else {
-      const bounds = this.getTextBounds(layerKey);
-      tagX = bounds.left;
-      tagY = bounds.top - 54;
+    if (style.shadow) {
+      this.ctx.globalAlpha = 0.28;
+      this.ctx.fillStyle = "#000000";
+      this.ctx.fillText(displayValue, layer.x, layer.y + Math.max(2, Math.round(layer.fontSize * 0.05)));
     }
 
-    tagX = this.clamp(tagX, 20, this.canvas.width - 160);
-    tagY = this.clamp(tagY, 20, this.canvas.height - 50);
-
-    this.ctx.save();
-    this.ctx.fillStyle = "rgba(13, 13, 13, 0.82)";
-    this.ctx.strokeStyle = "rgba(255, 214, 123, 0.82)";
-    this.ctx.lineWidth = 2;
-    this.roundRect(tagX, tagY, 144, 40, 14);
-    this.ctx.fill();
-    this.ctx.stroke();
-    this.ctx.fillStyle = "#f6ecd9";
-    this.ctx.font = '600 20px "Avenir Next", "PingFang SC", sans-serif';
-    this.ctx.textAlign = "left";
-    this.ctx.textBaseline = "middle";
-    this.ctx.fillText(`${label}  当前`, tagX + 16, tagY + 20);
+    this.ctx.globalAlpha = 1;
+    this.ctx.fillStyle = style.fill;
+    this.ctx.fillText(displayValue, layer.x, layer.y);
     this.ctx.restore();
   }
 
@@ -876,8 +739,7 @@ class PoexCertificateEditor {
 
   getDisplayValue(layerKey) {
     const layer = this.editorState[layerKey];
-    const trimmed = layer.value.trim();
-    return trimmed || this.textStyles[layer.styleKey].placeholder;
+    return layer.value.trim();
   }
 
   showLoading() {
