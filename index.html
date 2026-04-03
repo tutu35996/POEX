@@ -4,131 +4,129 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>POEX 证书生成器</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="icon" type="image/svg+xml" href="assets/icons/lion.svg">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 <div class="app-shell">
-  <aside class="sidebar">
-    <section class="brand-card">
-      <h1>POEX 证书生成器</h1>
-    </section>
-
-    <section class="sidebar-card">
-      <div class="section-title-row">
-        <h2>模板列表</h2>
-        <span id="templateCount" class="template-total">10 张</span>
-      </div>
-      <div id="templateGroups" class="template-groups"></div>
-    </section>
-
-    <section class="sidebar-card">
-      <div class="section-title-row compact-row">
-        <h2>当前模板</h2>
-      </div>
-      <p id="currentTemplateLabel" class="current-template-label">POEX 晋级图 中文 01</p>
-      <p id="currentTemplateMeta" class="current-template-meta">1536 x 2752</p>
-    </section>
+  <aside class="sidebar panel">
+    <div class="sidebar-header">
+      <h2>选择模板</h2>
+      <p id="templateCount" class="sidebar-meta">10 个模板</p>
+    </div>
+    <div id="templateGroups" class="template-groups"></div>
   </aside>
 
-  <main class="workspace">
-    <section class="preview-panel">
-      <div class="panel-card preview-card">
-        <div class="section-title-row preview-row">
-          <h2>证书预览</h2>
+  <main class="main-content">
+    <header class="page-header">
+      <div class="page-header-copy">
+        <h1>POEX 证书生成</h1>
+        <p>上传头像，选择模板，调整内容，实时预览后直接导出 PNG。</p>
+      </div>
+      <div class="page-meta">
+        <div class="header-stat">
+          <span>当前模板</span>
+          <strong id="currentTemplateLabel">POEX 晋级图 中文 01</strong>
         </div>
-        <div class="canvas-shell">
-          <div class="canvas-stage">
-            <canvas id="certificateCanvas" width="1536" height="2752"></canvas>
+        <div class="header-stat">
+          <span>尺寸</span>
+          <strong id="currentTemplateMeta">1536 x 2752</strong>
+        </div>
+      </div>
+    </header>
 
-            <div id="loadingOverlay" class="overlay loading-overlay">
-              <div class="overlay-card">
-                <div class="spinner"></div>
-                <p>正在加载 POEX 模板...</p>
-              </div>
+    <div class="content-wrapper">
+      <section class="controls-panel">
+        <div class="controls panel">
+          <div class="section-header">
+            <h3>编辑控制</h3>
+            <p>上传图片并调整文字大小。</p>
+          </div>
+
+          <section class="control-section">
+            <h4>头像设置</h4>
+            <label class="field">
+              <span>上传头像</span>
+              <input type="file" id="avatarUpload" accept="image/*">
+            </label>
+            <p class="field-tip">也可以直接粘贴图片。</p>
+            <div class="button-group">
+              <button type="button" class="small-btn" data-scale="-1" data-layer="avatar">缩小头像</button>
+              <button type="button" class="small-btn" data-scale="1" data-layer="avatar">放大头像</button>
+            </div>
+          </section>
+
+          <section class="control-section">
+            <h4>姓名设置</h4>
+            <label class="field">
+              <span>姓名</span>
+              <input type="text" id="nameInput" placeholder="输入姓名">
+            </label>
+            <div class="button-group">
+              <button type="button" class="small-btn" data-scale="-1" data-layer="name">缩小姓名</button>
+              <button type="button" class="small-btn" data-scale="1" data-layer="name">放大姓名</button>
+            </div>
+          </section>
+
+          <section class="control-section">
+            <h4>UID 设置</h4>
+            <label class="field">
+              <span>UID</span>
+              <input type="text" id="uidInput" placeholder="输入 UID">
+            </label>
+            <div class="button-group">
+              <button type="button" class="small-btn" data-scale="-1" data-layer="uid">缩小 UID</button>
+              <button type="button" class="small-btn" data-scale="1" data-layer="uid">放大 UID</button>
+            </div>
+          </section>
+
+          <div class="panel-note">
+            <p>提示：头像、姓名和 UID 都可以直接在预览里拖动调整。</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="preview-panel">
+        <div class="preview-container panel">
+          <div class="preview-header">
+            <div class="preview-title">
+              <h3>证书预览</h3>
             </div>
 
-            <div id="errorOverlay" class="overlay error-overlay hidden">
-              <div class="overlay-card">
-                <p>模板加载失败，请重新加载。</p>
-                <button type="button" class="action-btn inline-action" id="retryBtn">重新加载</button>
+            <div class="preview-buttons">
+              <button type="button" class="copy-btn" id="copyBtn">复制图片</button>
+              <button type="button" class="download-btn" id="downloadBtn">下载 PNG</button>
+            </div>
+          </div>
+
+          <div class="canvas-shell">
+            <div class="canvas-stage">
+              <canvas id="certificateCanvas" width="1536" height="2752"></canvas>
+
+              <div id="loadingOverlay" class="overlay loading-overlay">
+                <div class="overlay-card">
+                  <div class="spinner"></div>
+                  <p>正在加载模板...</p>
+                </div>
+              </div>
+
+              <div id="errorOverlay" class="overlay error-overlay hidden">
+                <div class="overlay-card">
+                  <h4>模板加载失败</h4>
+                  <p>请刷新页面后重试。</p>
+                  <button type="button" class="retry-btn" id="retryBtn">重新加载</button>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
-
-    <aside class="controls-panel">
-      <div class="panel-card control-card layer-card" data-layer="avatar">
-        <div class="control-header">
-          <h3>头像</h3>
-        </div>
-        <p class="control-note">1.支持复制图片粘贴到网站,上传头像</p>
-        <div class="field-grid">
-          <label class="field field-wide">
-            <span>头像图片</span>
-            <input type="file" id="avatarUpload" accept="image/*">
-          </label>
-        </div>
-      </div>
-
-      <div class="panel-card control-card layer-card" data-layer="name">
-        <div class="control-header">
-          <h3>姓名</h3>
-        </div>
-        <p class="control-note">2.直接填写姓名,如果太大,缩小文字</p>
-        <div class="field-grid">
-          <label class="field field-wide">
-            <span>姓名文本</span>
-            <input type="text" id="nameInput" placeholder="输入姓名">
-          </label>
-        </div>
-        <div class="control-footer compact-footer">
-          <div class="step-group grow-group">
-            <button type="button" class="micro-btn" data-scale="-1" data-layer="name">缩小文字</button>
-            <button type="button" class="micro-btn" data-scale="1" data-layer="name">放大文字</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel-card control-card layer-card" data-layer="uid">
-        <div class="control-header">
-          <h3>UID</h3>
-        </div>
-        <p class="control-note">3.填写完成,右键复制图片发送</p>
-        <div class="field-grid">
-          <label class="field field-wide">
-            <span>UID 文本</span>
-            <input type="text" id="uidInput" placeholder="输入 UID">
-          </label>
-        </div>
-        <div class="control-footer compact-footer">
-          <div class="step-group grow-group">
-            <button type="button" class="micro-btn" data-scale="-1" data-layer="uid">缩小文字</button>
-            <button type="button" class="micro-btn" data-scale="1" data-layer="uid">放大文字</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel-card control-card export-card">
-        <div class="control-header">
-          <h3>导出</h3>
-        </div>
-        <div class="control-footer compact-footer export-actions">
-          <div class="step-group grow-group">
-            <button type="button" class="action-btn" id="copyBtn">复制图片</button>
-            <button type="button" class="action-btn action-btn-strong" id="downloadBtn">下载 PNG</button>
-          </div>
-        </div>
-      </div>
-    </aside>
+      </section>
+    </div>
   </main>
 </div>
-
-<footer class="site-footer">
-  <p>免责声明：本页仅用于模板排版与图片生成演示，素材与输出内容请自行核验并承担使用责任。风云美工仅提供视觉制作与排版支持。</p>
-</footer>
 
 <script src="assets/js/app.js"></script>
 </body>

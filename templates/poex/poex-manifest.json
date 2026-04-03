@@ -4,6 +4,29 @@
       "key": "poex-upgrade-zh",
       "label": "POEX 晋级图 中文",
       "dir": "upgrade-zh",
+      "config": {
+        "nudgeStep": 1,
+        "avatar": {
+          "x": 186,
+          "y": 327,
+          "width": 179,
+          "height": 215,
+          "shape": "ellipse",
+          "aspectRatio": 0.832558
+        },
+        "name": {
+          "x": 272,
+          "y": 628,
+          "fontSize": 46,
+          "anchor": "baseline-center"
+        },
+        "uid": {
+          "x": 236,
+          "y": 683,
+          "fontSize": 38,
+          "anchor": "left"
+        }
+      },
       "templates": [
         { "index": 1, "label": "01", "src": "templates/poex/upgrade-zh/poex_upgrade_zh_01.png" },
         { "index": 2, "label": "02", "src": "templates/poex/upgrade-zh/poex_upgrade_zh_02.png" },
@@ -15,6 +38,86 @@
         { "index": 8, "label": "08", "src": "templates/poex/upgrade-zh/poex_upgrade_zh_08.png" },
         { "index": 9, "label": "09", "src": "templates/poex/upgrade-zh/poex_upgrade_zh_09.png" },
         { "index": 10, "label": "10", "src": "templates/poex/upgrade-zh/poex_upgrade_zh_10.png" }
+      ]
+    },
+    {
+      "key": "poex-reward-en",
+      "label": "POEX 晋级奖励 英语",
+      "dir": "reward-en",
+      "config": {
+        "nudgeStep": 1,
+        "avatar": {
+          "x": 303,
+          "y": 336,
+          "width": 416,
+          "height": 407,
+          "shape": "ellipse",
+          "aspectRatio": 1.022113
+        },
+        "name": {
+          "x": 512,
+          "y": 835,
+          "fontSize": 50,
+          "anchor": "baseline-center"
+        },
+        "uid": {
+          "x": 489,
+          "y": 885,
+          "fontSize": 34,
+          "anchor": "left"
+        }
+      },
+      "templates": [
+        { "index": 1, "label": "01", "src": "templates/poex/reward-en/poex_reward_en_01.png" },
+        { "index": 2, "label": "02", "src": "templates/poex/reward-en/poex_reward_en_02.png" },
+        { "index": 3, "label": "03", "src": "templates/poex/reward-en/poex_reward_en_03.png" },
+        { "index": 4, "label": "04", "src": "templates/poex/reward-en/poex_reward_en_04.png" },
+        { "index": 5, "label": "05", "src": "templates/poex/reward-en/poex_reward_en_05.png" },
+        { "index": 6, "label": "06", "src": "templates/poex/reward-en/poex_reward_en_06.png" },
+        { "index": 7, "label": "07", "src": "templates/poex/reward-en/poex_reward_en_07.png" },
+        { "index": 8, "label": "08", "src": "templates/poex/reward-en/poex_reward_en_08.png" },
+        { "index": 9, "label": "09", "src": "templates/poex/reward-en/poex_reward_en_09.png" },
+        { "index": 10, "label": "10", "src": "templates/poex/reward-en/poex_reward_en_10.png" }
+      ]
+    },
+    {
+      "key": "poex-reward-vi",
+      "label": "POEX 晋级奖励 越南语",
+      "dir": "reward-vi",
+      "config": {
+        "nudgeStep": 1,
+        "avatar": {
+          "x": 303,
+          "y": 336,
+          "width": 416,
+          "height": 407,
+          "shape": "ellipse",
+          "aspectRatio": 1.022113
+        },
+        "name": {
+          "x": 512,
+          "y": 835,
+          "fontSize": 50,
+          "anchor": "baseline-center"
+        },
+        "uid": {
+          "x": 489,
+          "y": 885,
+          "fontSize": 34,
+          "anchor": "left"
+        }
+      },
+      "templates": [
+        { "index": 1, "label": "01", "src": "templates/poex/reward-vi/poex_reward_vi_01.png" },
+        { "index": 2, "label": "02", "src": "templates/poex/reward-vi/poex_reward_vi_02.png" },
+        { "index": 3, "label": "03", "src": "templates/poex/reward-vi/poex_reward_vi_03.png" },
+        { "index": 4, "label": "04", "src": "templates/poex/reward-vi/poex_reward_vi_04.png" },
+        { "index": 5, "label": "05", "src": "templates/poex/reward-vi/poex_reward_vi_05.png" },
+        { "index": 6, "label": "06", "src": "templates/poex/reward-vi/poex_reward_vi_06.png" },
+        { "index": 7, "label": "07", "src": "templates/poex/reward-vi/poex_reward_vi_07.png" },
+        { "index": 8, "label": "08", "src": "templates/poex/reward-vi/poex_reward_vi_08.png" },
+        { "index": 9, "label": "09", "src": "templates/poex/reward-vi/poex_reward_vi_09.png" },
+        { "index": 10, "label": "10", "src": "templates/poex/reward-vi/poex_reward_vi_10.png" }
       ]
     }
   ]
