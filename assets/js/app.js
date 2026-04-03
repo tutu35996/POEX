@@ -20,6 +20,9 @@ class PoexCertificateEditor {
       pointerId: null
     };
     this.expandedGroupKey = "poex-reward-en";
+    this.appliedGroupKey = null;
+    this.templateImageCache = new Map();
+    this.templateLoadRequestId = 0;
 
     this.textStyles = {
       nameZh: {
@@ -76,6 +79,8 @@ class PoexCertificateEditor {
         shape: "ellipse",
         frameSrc: "",
         frameImage: null,
+        overlaySrc: "",
+        overlayImage: null,
         image: null,
         imageSrc: ""
       },
@@ -139,6 +144,7 @@ class PoexCertificateEditor {
       avatar: {
         ...this.defaultState.avatar,
         frameImage: null,
+        overlayImage: null,
         image: null,
         imageSrc: ""
       },
@@ -166,7 +172,9 @@ class PoexCertificateEditor {
         aspectRatio: Number(config.avatar?.aspectRatio) || (avatarWidth / avatarHeight) || defaultAvatar.aspectRatio,
         shape: config.avatar?.shape || defaultAvatar.shape,
         frameSrc: config.avatar?.frameSrc || "",
-        frameImage: null
+        frameImage: null,
+        overlaySrc: config.avatar?.overlaySrc || "",
+        overlayImage: null
       },
       name: {
         x: Number(config.name?.x) || defaultName.x,
@@ -194,7 +202,7 @@ class PoexCertificateEditor {
     const preferredTemplate = this.getTemplateConfig(this.defaultState.templateGroup, this.defaultState.templateIndex)
       || this.getFirstTemplateConfig();
     if (preferredTemplate) {
-      this.selectTemplate(preferredTemplate.groupKey, preferredTemplate.index);
+      await this.selectTemplate(preferredTemplate.groupKey, preferredTemplate.index);
       return;
     }
 
@@ -231,9 +239,25 @@ class PoexCertificateEditor {
     });
   }
 
+  loadTemplateImage(src) {
+    if (this.templateImageCache.has(src)) {
+      return this.templateImageCache.get(src);
+    }
+
+    const promise = new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = () => reject(new Error(`Failed to load template: ${src}`));
+      image.src = src;
+    });
+
+    this.templateImageCache.set(src, promise);
+    return promise;
+  }
+
   async loadManifest() {
     try {
-      const response = await fetch(this.manifestUrl, { cache: "no-store" });
+      const response = await fetch(this.manifestUrl, { cache: "default" });
       if (!response.ok) {
         throw new Error(`Manifest request failed: ${response.status}`);
       }
@@ -632,12 +656,14 @@ class PoexCertificateEditor {
     const avatarImage = this.editorState.avatar.image;
     const avatarImageSrc = this.editorState.avatar.imageSrc;
     const frameImage = await this.loadImageAsset(group.config.avatar.frameSrc);
+    const overlayImage = await this.loadImageAsset(group.config.avatar.overlaySrc);
 
     this.editorState.nudgeStep = group.config.nudgeStep;
     this.editorState.avatar = {
       ...this.editorState.avatar,
       ...group.config.avatar,
       frameImage,
+      overlayImage,
       image: avatarImage,
       imageSrc: avatarImageSrc
     };
@@ -651,6 +677,7 @@ class PoexCertificateEditor {
       ...group.config.uid,
       styleKey: group.key === "poex-upgrade-zh" ? "uidZh" : "uidIntl"
     };
+    this.appliedGroupKey = groupKey;
   }
 
   async selectTemplate(groupKey, index) {
@@ -660,7 +687,7 @@ class PoexCertificateEditor {
       return;
     }
 
-    const groupChanged = this.editorState.templateGroup !== groupKey;
+    const groupChanged = this.appliedGroupKey !== groupKey;
     if (groupChanged) {
       await this.applyGroupConfig(groupKey);
     }
@@ -670,7 +697,7 @@ class PoexCertificateEditor {
     this.editorState.templateIndex = index;
     this.syncAllInputs();
     this.renderTemplateGroups();
-    this.loadCurrentTemplate();
+    await this.loadCurrentTemplate();
   }
 
   updateTemplateButtons() {
@@ -681,21 +708,26 @@ class PoexCertificateEditor {
     });
   }
 
-  loadCurrentTemplate() {
+  async loadCurrentTemplate() {
     const template = this.getTemplateConfig(this.editorState.templateGroup, this.editorState.templateIndex);
     if (!template) {
       this.setNoTemplateState();
       return;
     }
 
-    const image = new Image();
+    const requestId = ++this.templateLoadRequestId;
 
     this.setActionAvailability(false);
     this.setStatus(`正在加载 ${template.label}...`, "muted");
     this.showLoading();
     this.hideError();
 
-    image.onload = () => {
+    try {
+      const image = await this.loadTemplateImage(template.src);
+      if (requestId !== this.templateLoadRequestId) {
+        return;
+      }
+
       this.templateImage = image;
       this.templateMeta = {
         width: image.naturalWidth,
@@ -711,16 +743,16 @@ class PoexCertificateEditor {
       this.setActionAvailability(true);
       this.setStatus(`已切换到 ${template.label}，可以继续生成或下载。`, "success");
       this.draw();
-    };
-
-    image.onerror = () => {
+    } catch (error) {
+      if (requestId !== this.templateLoadRequestId) {
+        return;
+      }
+      console.error("模板加载失败：", error);
       this.hideLoading();
       this.setActionAvailability(false);
       this.setStatus(`模板加载失败：${template.label}`, "error");
       this.showError();
-    };
-
-    image.src = template.src;
+    }
   }
 
   updateTemplateSummary() {
@@ -736,6 +768,7 @@ class PoexCertificateEditor {
   setNoTemplateState() {
     this.editorState.templateGroup = null;
     this.editorState.templateIndex = null;
+    this.appliedGroupKey = null;
     this.templateImage = new Image();
     this.templateMeta = {
       width: 0,
@@ -887,6 +920,7 @@ class PoexCertificateEditor {
     this.drawAvatarLayer();
     this.drawTextLayer("name");
     this.drawTextLayer("uid");
+    this.drawOverlayLayer();
   }
 
   drawAvatarLayer() {
@@ -941,6 +975,15 @@ class PoexCertificateEditor {
     if (avatar.frameImage) {
       this.ctx.drawImage(avatar.frameImage, 0, 0, this.canvas.width, this.canvas.height);
     }
+  }
+
+  drawOverlayLayer() {
+    const overlayImage = this.editorState.avatar.overlayImage;
+    if (!overlayImage) {
+      return;
+    }
+
+    this.ctx.drawImage(overlayImage, 0, 0, this.canvas.width, this.canvas.height);
   }
 
   drawEmptyState() {

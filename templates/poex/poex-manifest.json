@@ -52,7 +52,8 @@
           "width": 416,
           "height": 407,
           "shape": "ellipse",
-          "aspectRatio": 1.022113
+          "aspectRatio": 1.022113,
+          "overlaySrc": "templates/poex/reward-shared/other_language_mask.png"
         },
         "name": {
           "x": 512,
@@ -92,7 +93,8 @@
           "width": 416,
           "height": 407,
           "shape": "ellipse",
-          "aspectRatio": 1.022113
+          "aspectRatio": 1.022113,
+          "overlaySrc": "templates/poex/reward-shared/other_language_mask.png"
         },
         "name": {
           "x": 512,
